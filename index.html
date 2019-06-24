@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>date change and mark</title>
+</head>
+
+
+<style>
+	.date-contain{width:auto;min-width:280px;height:auto;min-height: 320px;}
+	.date-header{width:280px;margin:0 auto;}
+	.date-title{height:40px;padding:0 10px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;}
+	.date-button{width:30px;height:30px;line-height:30px;text-align:center;cursor: pointer;font-size: 24px;font-weight:600;color:#888;-webkit-user-select: none;
+	-moz-webkit-user-select: none;
+	-ms-webkit-user-select: none;
+	-o-webkit-user-select: none;}
+	.date-button:hover{color:#df8f37;}
+	.date-disableBtn{color:#ccc;cursor: default;}
+	.date-disableBtn:hover{color:#ccc;}
+	.date-text{color:#6c6c6c;font-size:18px;}
+
+	.date-week{width:280px;margin:0 auto;height:40px;display:flex;flex-direction: row;justify-content: flex-end;align-items: center;}
+	.date-week > span{width:auto;min-width:30px;height:30px;line-height:30px;text-align:center;font-size:14px;color:#8d99a3;margin:5px;}
+	.date-body{width:auto;min-width: 280px;padding:0;margin:0;}
+	.date-body > li{list-style: none;width:280px;height:40px;margin:0 auto;display: flex;flex-direction: row;justify-content: flex-end;align-items: center;align-content: center;}
+	.date-body > li:last-child{justify-content: flex-start !important;}
+	.date-body > li > span{width:auto;min-width:30px;height:30px;line-height:30px;text-align:center;font-size:14px;color:#868F96;margin:5px;border-radius: 50%;}
+
+
+	.date-body > li > span.setDay{background-color: #FFB767;color:#fff;}
+</style>
+
+
+<body>
+
+
+<div class="date-contain">
+	<div class="date-header">
+		<div class="date-title">
+			<div class="date-button" id="prevDate"> &lt; </div>
+			<div class="date-text" id="curDate"></div>
+			<div class="date-button" id="nextDate"> &gt; </div>
+		</div>
+		<div class="date-week">
+			<span>Sun</span>
+			<span>Mon</span>
+			<span>Tue</span>
+			<span>Wed</span>
+			<span>Thu</span>
+			<span>Fri</span>
+			<span>Sat</span>
+		</div>
+	</div>
+
+	<ul class="date-body" id="dateList">
+		
+	</ul>
+</div>
+
+<script>
+
+
+
+	
+	var date = new Date();
+	var year = date.getFullYear();
+	var month = date.getMonth();
+
+	var tiemObj = {
+		count: 0,
+		calcYear: year,
+		calcMonth: month
+	};
+
+	var dateArr = ['2019-06-07','2019-06-09','2018-06-03','2019-06-19','2019-05-26'];
+
+	//初始化
+	change('',dateArr);
+
+	//向后翻页
+	document.getElementById('prevDate').addEventListener('click',function(){
+		change('reduce',dateArr);
+
+		if(document.getElementById('nextDate').classList.contains('date-disableBtn')){
+			document.getElementById('nextDate').classList.remove('date-disableBtn');
+		}
+	});
+
+	//向前翻页
+	document.getElementById('nextDate').addEventListener('click',function(){
+		change('add',dateArr);
+
+		var curMonth = ( month+1 < 10 ? '0'+(month+1) : month+1 );
+		var getTime = document.getElementById('curDate').getAttribute('data-date');
+		if(getTime.substr(0,4) == year && getTime.substr(5,2) == curMonth){
+			document.getElementById('nextDate').classList.add('date-disableBtn');
+			return false;
+		}
+	});
+
+
+	function change(state,dateArr){
+		//向前翻页
+		if(state == 'add'){
+			if(tiemObj.calcYear < year){ //不是当前的年份
+				if(tiemObj.calcMonth >= 11){
+					tiemObj.calcMonth = 0;
+					tiemObj.calcYear = tiemObj.calcYear + 1;
+				}else{
+					tiemObj.calcMonth = tiemObj.calcMonth + 1;
+				}
+			}else{
+				if(tiemObj.calcMonth < month){
+					tiemObj.calcMonth = tiemObj.calcMonth + 1;
+				}
+			}
+		}else if(state == 'reduce'){//向后翻页
+			if(tiemObj.calcYear == year){//判断是否是在当前的年份
+				tiemObj.count++;
+
+				if(tiemObj.calcMonth == 0){
+					tiemObj.count = 0;
+					tiemObj.calcMonth = 11;
+					tiemObj.calcYear = year - 1;
+				}else{
+					tiemObj.calcMonth = month - tiemObj.count;
+
+					if(tiemObj.count == month){
+						tiemObj.count = 0;
+					}
+				}
+
+			}else{ //不是当前的年份
+				if(tiemObj.calcMonth <= 0){
+					tiemObj.calcMonth = 11;
+					tiemObj.calcYear = tiemObj.calcYear - 1;
+				}else{
+					tiemObj.calcMonth = tiemObj.calcMonth - 1;
+				}
+			}
+
+		}
+
+		document.getElementById('curDate').innerHTML = tiemObj.calcYear+'年'+ ( tiemObj.calcMonth+1 < 10 ? '0'+(tiemObj.calcMonth+1) : tiemObj.calcMonth+1 )+'月';
+		document.getElementById('curDate').setAttribute('data-date', tiemObj.calcYear+'-'+ ( tiemObj.calcMonth+1 < 10 ? '0'+(tiemObj.calcMonth+1) : tiemObj.calcMonth+1 ) );
+		
+		//当前月的第一天的日期
+		var firstDay = new Date(tiemObj.calcYear,tiemObj.calcMonth,1);
+		//第一天是星期几
+		var weekday = firstDay.getDay();
+
+		//求当前月一共有多少天
+		//new Date(year,month+1,0) ： month+1是下一个月，day为0代表的是上一个月的最后一天，即我们所需的当前月的最后一天。
+		//getDate（）则返回这个日期对象是一个月中的第几天，我们由最后一天得知这个月一共有多少天
+		var days = new Date(tiemObj.calcYear,tiemObj.calcMonth+1,0).getDate();
+		var curDay = new Date().getDate();
+
+		var res = "";
+		//输出第一天之前的空格
+		for(var i=0;i<weekday;i++){
+		    res+="  ";
+		}
+		//中转变量
+		var curRes = '';
+
+		for(var j=1;j<=days ;j++){
+
+			if(dateArr && dateArr.length >0){
+
+				for(var m=0;m<dateArr.length;m++){
+					curRes = '';
+					// console.log(j,dateArr[m].substr(5,2),tiemObj.calcMonth+1)
+					if(dateArr[m].substr(0,4) == tiemObj.calcYear && dateArr[m].substr(5,2) == tiemObj.calcMonth+1 && dateArr[m].substr(8,2) == j ){
+
+						if(j<10){
+							res += '<span class="setDay"> '+ j +' </span>';
+						}else{
+							res += '<span class="setDay">'+ j +'</span>';
+						}
+
+						break;
+					}else{
+						if(j<10){
+							curRes += '<span> '+ j +' </span>';
+						}else{
+							curRes += '<span>'+ j +'</span>';
+						}
+					}
+
+				}
+
+				res += curRes;
+
+			}else{
+				if(j<10){
+					res += '<span> '+ j +' </span>';
+				}else{
+					res += '<span>'+ j +'</span>';
+				}
+			}
+			
+	    weekday++;
+
+	    //如果是周日则换行
+	    if(weekday%7 == 0){
+        weekday = 0;
+        res += '||';
+	    }
+		}
+
+		var arrRes = res.split('||');
+		var htmlText = '';
+		for(var k=0;k<arrRes.length;k++){
+			htmlText += '<li>'+ arrRes[k] +'</li>';
+		}
+
+		document.getElementById("dateList").innerHTML = htmlText;
+
+	}
+
+
+
+
+</script>
+	
+</body>
+</html>
