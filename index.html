@@ -57,10 +57,85 @@
 	</ul>
 </div>
 
+	
+<script src="./js/index.js"></script>
+
 <script>
+	
+	var curYear = new Date().getFullYear();
+  var curMonth = new Date().getMonth();
+
+  var dateArr = ['06-10','07-15','06-28','05-08']; //注意日期都为双数
+  var limitBirthydayTime = '2018-08';
+
+  //初始化
+  dateForm.change('init',dateArr);
+
+  //向后翻页
+  document.getElementById('prevDate').addEventListener('click',function(){
+    var getcurYear = document.getElementById('curDate').getAttribute('data-date').substr(0,4);
+    var getcurMonth = document.getElementById('curDate').getAttribute('data-date').substr(5,2);
+    if(getcurYear == limitBirthydayTime.substr(0,4) && getcurMonth == limitBirthydayTime.substr(5,2)){
+      document.getElementById('prevDate').classList.add('date-disableBtn');
+      return;
+    }
+    
+    dateForm.change('reduce',dateArr);
+
+
+    if(document.getElementById('nextDate').classList.contains('date-disableBtn')){
+      document.getElementById('nextDate').classList.remove('date-disableBtn');
+    }
+  });
+
+  //向前翻页
+  document.getElementById('nextDate').addEventListener('click',function(){
+
+    var getTime = document.getElementById('curDate').getAttribute('data-date');
+    if(getTime.substr(0,4) == curYear && getTime.substr(5,2) >= parseInt(curMonth)+1){
+      document.getElementById('nextDate').classList.add('date-disableBtn');
+      return;
+    }
+
+    dateForm.change('add',dateArr);
+
+    var getcurMonth = document.getElementById('curDate').getAttribute('data-date').substr(5,2);
+
+
+    if(document.getElementById('prevDate').classList.contains('date-disableBtn')){
+      document.getElementById('prevDate').classList.remove('date-disableBtn');
+    }
+
+  });
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 	
 	var date = new Date();
 	var year = date.getFullYear();
@@ -215,7 +290,7 @@
 	}
 
 
-
+*/
 
 </script>
 	
