@@ -123,11 +123,7 @@
 					tiemObj.calcMonth = 11;
 					tiemObj.calcYear = year - 1;
 				}else{
-					tiemObj.calcMonth = month - tiemObj.count;
-
-					if(tiemObj.count == month){
-						tiemObj.count = 0;
-					}
+					timeObj.calcMonth = timeObj.calcMonth - 1;
 				}
 
 			}else{ //不是当前的年份
